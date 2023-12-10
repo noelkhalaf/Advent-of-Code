@@ -2,6 +2,7 @@ with open("D:\Projects\Python Testing\Advent of Code\day 7\input.txt", "r") as f
     lines = [line.rstrip() for line in f]
 
 cards_dict = {
+    "J" : 1, # Comment for part 2
     "2" : 2,
     "3" : 3,
     "4" : 4,
@@ -11,7 +12,7 @@ cards_dict = {
     "8" : 8,
     "9" : 9,
     "T" : 10,
-    "J" : 11,
+    # "J" : 11, # Uncomment for part 1
     "Q" : 12,
     "K" : 13,
     "A" : 14,
@@ -137,23 +138,55 @@ def firstHalf():
     two_pairs = sortDetailedHands(two_pairs)
     one_pairs = sortDetailedHands(one_pairs)
     high_cards = sortDetailedHands(high_cards)
-
-    print("five_of_a_kinds:", len(five_of_a_kinds), five_of_a_kinds)
-    print("four_of_a_kinds:", len(four_of_a_kinds), four_of_a_kinds)
-    print("full_houses:", len(full_houses), full_houses)
-    print("three_of_a_kinds:", len(three_of_a_kinds), three_of_a_kinds)
-    print("two_pairs:", len(two_pairs), two_pairs)
-    print("one_pairs:", len(one_pairs), one_pairs)
-    print("high_cards:", len(high_cards), high_cards)
-
     all_cards = high_cards + one_pairs + two_pairs + three_of_a_kinds + full_houses + four_of_a_kinds + five_of_a_kinds
     sum = countTotalWinnings(all_cards)
-
     print("sum:", sum)
 
 def secondHalf():
     sum = 0
+    five_of_a_kinds = []
+    four_of_a_kinds = []
+    full_houses = []
+    three_of_a_kinds = []
+    two_pairs = []
+    one_pairs = []
+    high_cards = []
+    hands = [line.split()[0] for line in lines]
+    bids = [line.split()[1] for line in lines]
+    while hands:
+        hand = hands[-1]
+        hand_replaced_j = hand
+        hand_mappings = {card:hand.count(card) for card in hand}
+        if "J" in hand_mappings.keys() and hand_mappings["J"] != 5 and hand_mappings["J"] > 0:
+            hand_mappings["J"] = 0
+            most_appearing_card = max(hand_mappings, key=hand_mappings.get)
+            hand_replaced_j = hand_replaced_j.replace("J", most_appearing_card)
+
+        if isFiveOfAKind(hand_replaced_j):
+            five_of_a_kinds.append([hands.pop(), bids.pop(), cards_dict[hand[0]]])
+        elif isFourOfAKind(hand_replaced_j):
+            four_of_a_kinds.append([hands.pop(), bids.pop(), findDuplicateCards(hand)])
+        elif isFullHouse(hand_replaced_j):
+            full_houses.append([hands.pop(), bids.pop(), findDuplicateCards(hand)])
+        elif isThreeOfAKind(hand_replaced_j):
+            three_of_a_kinds.append([hands.pop(), bids.pop(), findDuplicateCards(hand)])
+        elif isTwoPair(hand_replaced_j):
+            two_pairs.append([hands.pop(), bids.pop(), findDuplicateCards(hand)])
+        elif isOnePair(hand_replaced_j):
+            one_pairs.append([hands.pop(), bids.pop(), findDuplicateCards(hand)])
+        else:
+            high_cards.append([hands.pop(), bids.pop(), findDuplicateCards(hand)])
+
+    five_of_a_kinds = sortDetailedHands(five_of_a_kinds)
+    four_of_a_kinds = sortDetailedHands(four_of_a_kinds)
+    full_houses = sortDetailedHands(full_houses)
+    three_of_a_kinds = sortDetailedHands(three_of_a_kinds)
+    two_pairs = sortDetailedHands(two_pairs)
+    one_pairs = sortDetailedHands(one_pairs)
+    high_cards = sortDetailedHands(high_cards)
+    all_cards = high_cards + one_pairs + two_pairs + three_of_a_kinds + full_houses + four_of_a_kinds + five_of_a_kinds
+    sum = countTotalWinnings(all_cards)
     print("sum:", sum)
 
-firstHalf()
-#secondHalf()
+#firstHalf()
+secondHalf()
